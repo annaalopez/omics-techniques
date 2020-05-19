@@ -1,0 +1,136 @@
+---
+title: "Comparing Control and Schizophrenic hiPSC-derived Neurons"
+subtitle: "Lab 0: ExpressionSets"
+author: "Anna López Carrasco"
+date: "17/5/2020"
+output: html_document
+GitHub: https://github.com/annaalopez/omics_techniques
+---
+<div style="background-color: #86CBBB; 1px; height:3px " ></div><br>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+require(knitr)
+opts_chunk$set(
+concordance=FALSE, echo=TRUE, cache=TRUE, warning=FALSE, error=FALSE, message=FALSE)
+```
+
+## Introduction 
+The objective of this practical is to get familiar with ExpressionSets by doing an analysis with Bioconductor. To do this, we need GEOquery package to download the data directly. 
+
+## Study description
+The study has been selected from the Gene Expression Omnibus Database with accession code GSE25673.
+Link: https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE25673
+
+**Status** Public on May 01, 2011
+**Title** Comparing Control and Schizophrenic hiPSC-derived Neurons
+**Organism** Homo Sapiens
+**Experiment type** Expression profiling by array
+**Summay** Schizophrenia is a debilitating neurological disorder for which no cure exists. Few defining characteristics of schizophrenic neurons have been identified and the molecular mechanisms responsible for schizophrenia are not well understood, in part due to the lack of patient material for study. Human induced pluripotent stem cells (hiPSCs) offer a new strategy for studying schizophrenia. We have created the first cell-based human model of a complex genetic psychiatric disease by generating hiPSCs from schizophrenic patients and subsequently differentiating these cells to hiPSC-derived neurons in vitro. Schizophrenic hiPSC-derived neurons showed diminished neuronal connectivity in conjunction with decreased neurite number, PSD95-protein levels and glutamate receptor expression. Gene expression profiles of schizophrenic hiPSC-derived neurons identified altered expression of many components of the cAMP and WNT signaling pathways. Key cellular and molecular elements of the schizophrenic phenotype were ameliorated following treatment of schizophrenic hiPSC-derived neurons with the antipsychotic loxapine.
+**Overall design** 3 independent differentiations (biological replicates) for each of four control and four schizophrenic patients were analyzed.
+**Contributors** Gage FH, Brennand KJ
+**Citations** Brennand KJ, Simone A, Jou J, Gelboin-Burkhart C et al. Modelling schizophrenia using human induced pluripotent stem cells. Nature 2011 May 12;473(7346):221-5. PMID: 21490598
+**Platform** GPL6244	[HuGene-1_0-st] Affymetrix Human Gene 1.0 ST Array [transcript (gene) version]
+
+<div style="background-color: #86CBBB; 1px; height:3px " ></div><br>
+
+## 1. Analysis
+### 1.1 Access the GEO series data
+
+```{r cars}
+library(GEOquery)
+gse <- getGEO("GSE25673", GSEMatrix = TRUE, getGPL = FALSE)
+show(gse)
+```
+There are 24 samples, which names go from GSM630785 to GSM630808, and 33297 features.
+The pubMed identifier for this data is 21490598 ("Modelling schizophrenia using human induced pluripotent stem cells.").
+
+```{r pressure, echo=FALSE}
+class(gse)
+names(gse)
+```
+The data is found in 1 list which contains 1 file with the matrix ("GSE25673_series_matrix.txt.gz")
+
+```{r pressure, echo=FALSE}
+esetFromGEO <- gse[[1]]
+esetFromGEO
+
+targets <- pData(esetFromGEO)
+targets
+head(targets)
+colnames(targets)
+```
+By using esetFromGEO <- gse[[1]] we obtain the ExpressionSet of the data. On the other hand by using targets <- pData(esetFromGEO) it is obtained the targets of the data , where the information is organized in a table with 34 columns (title, geo_accesion, status, organisms, molecule, etc).
+We can observe that from the 24 samples, 12 belong to the control (from 1 to 4 and from a to c) and the other control to the patient (from 1 to 4 and from a to c).
+
+### 1.2 The ExpressionSet
+Once the basic data features were observed, it's time for the ExpressionSet features:
+
+```{r pressure, echo=FALSE}
+ExpressionValues <- exprs(esetFromGEO)
+dim(ExpressionValues)
+head(exprs(esetFromGEO))
+```
+What does ExpressionValues <- exprs(esetFromGEO) is to create a matrix, then, taking a look to the dimensions, it can be observed that the Expression set has 332297 rows and 24 columns (represent the sample size).
+
+Although we already know from the beginning that the samples names go from GSM630785 to GSM630808, we can take a look directly to all the names.
+
+```{r pressure, echo=FALSE}
+colnames(ExpressionValues)
+```
+With the following function we can obtain a summary of the Data:
+
+```{r pressure, echo=FALSE}
+summary(ExpressionValues)
+```
+The median and the mean look quite similar, what means that the sample won't be so skew and that is almost normal.
+
+If we want to take a look only to one sample (in this case sample 9), we can do it with the following;
+
+```{r pressure, echo=FALSE}
+summary(ExpressionValues[,9])
+```
+
+### 1.3 Principal component analysis
+```{r pressure, echo=FALSE}
+pcs <- prcomp(ExpressionValues)
+names(pcs)
+summary(pcs)
+
+barplot(pcs$sdev)
+```
+The standard deviation of the first sample is much higher in comparison with the rest.  (Sdev(p1)=10.4624096 and Sdev(p24)=0.1606069).
+
+```{r pressure, echo=FALSE}
+plot(pcs$rotation[,1], pcs$rotation[,2], col="plum", main="Representation of first two principal components")
+```
+
+### 1.4 Sorting genes from most to least variable
+```{r pressure, echo=FALSE}
+variab <- apply(ExpressionValues, 1, sd)
+orderedGenes <- order(variab, decreasing = TRUE)
+head(variab[order(variab, decreasing=TRUE)])
+head(orderedGenes)
+```
+
+### 1.5 Plots
+There are different plots we can apply to our data; histogram, boxplots or barplots. 
+```{r pressure, echo=FALSE}
+hist(ExpressionValues, main="GSE25673", col='plum')
+```
+Although we have obtained previously that the data follows almost a normal distribution, here, it can be observed that is slighlthy shifted to the left.
+By applying logarithms we can normalize the values of the data.
+
+```{r pressure, echo=FALSE}
+hist(log(ExpressionValues), main="GSE25673", col='plum')
+```
+
+```{r pressure, echo=FALSE}
+boxplot(ExpressionValues, main="GSE25673", col="plum", outline=FALSE, las=3)
+```
+As previously, we can also look at a single gen (gene 9) in each sample. By doing this, we can see if the gene has different expression among the samples.
+In this case, it can be observed that gene 9 hardly varies between the samples.
+
+```{r pressure, echo=FALSE}
+barplot(ExpressionValues[9,], col="plum", las=3)
+```
