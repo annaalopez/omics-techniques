@@ -24,8 +24,6 @@ concordance=FALSE, echo=TRUE, cache=TRUE, warning=FALSE, error=FALSE, message=FA
 
 ##Introduction
 This report can be found in https://github.com/annaalopez/omics_techniques
-
-
 This project is a synthesis exercise that combines all the previous exercises into a final one where we will add the detection of differentially expressed genes.Starting with a study description passing through the creation of plots, the design and contrast matrix until the permorming of an analysis using linear model approach. 
 
 </ul>
