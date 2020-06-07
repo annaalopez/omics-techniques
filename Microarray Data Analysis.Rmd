@@ -1,6 +1,5 @@
 ---
 title: "Comparing Control and Schizophrenic hiPSC-derived Neurons"
-subtitle: "Microarray Data Analysis"
 author: "Anna López Carrasco"
 date: "04/06/2020"
 output:
@@ -8,11 +7,11 @@ output:
     css: https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.css
     self_contained: yes
     theme: yeti
-
+  pdf_document: default
+subtitle: Microarray Data Analysis
 ---
 <div style="background-color: #86CBBB; 1px; height:3px ">
 </div>
-<p><br></p>
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -20,17 +19,18 @@ require(knitr)
 opts_chunk$set(
 concordance=FALSE, echo=TRUE, cache=TRUE, warning=FALSE, error=FALSE, message=FALSE)
 ```
-<div style="background-color: #86CBBB; 1px; height:3px " ></div><br>
 
-##Introduction
-This report can be found in https://github.com/annaalopez/omics_techniques
+
+# Introduction
+This report can be found in https://github.com/annaalopez/omics_techniques.
+
 This project is a synthesis exercise that combines all the previous exercises into a final one where we will add the detection of differentially expressed genes.Starting with a study description passing through the creation of plots, the design and contrast matrix until the permorming of an analysis using linear model approach. 
 
-</ul>
 <div style="background-color: #86CBBB; 1px; height:3px " ></div><br>
+</ul>
 
-##Study description
 
+# Study description
 The study has been selected from the Gene Expression Omnibus Database with accession code GSE25673.
 
 Link: https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE25673
@@ -55,6 +55,7 @@ Link: https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE25673
 
 </ul>
 <div style="background-color: #86CBBB; 1px; height:3px " ></div><br>
+
 
 ## 1. Analysis
 ### 1.1 Access the GEO series data
@@ -139,8 +140,12 @@ There are different plots we can apply to our data; histogram, boxplots or barpl
 ```{r}
 hist(ExpressionValues, main="GSE25673", col='plum')
 ```
+
+
 Although we have obtained previously that the data follows almost a normal distribution, here, it can be observed that is slighlthy shifted to the left.
 By applying logarithms we can normalize the values of the data.
+
+
 
 ```{r}
 hist(log(ExpressionValues), main="GSE25673", col='plum')
@@ -150,6 +155,8 @@ hist(log(ExpressionValues), main="GSE25673", col='plum')
 ```{r}
 boxplot(ExpressionValues, main="GSE25673", col="plum", outline=FALSE, las=3)
 ```
+
+
 As previously, we can also look at a single gen (gene 9) in each sample. By doing this, we can see if the gene has different expression among the samples.
 In this case, it can be observed that gene 9 hardly varies between the samples.
 
